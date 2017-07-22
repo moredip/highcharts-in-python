@@ -60,15 +60,17 @@ def render_chart_to_png(chart_definition):
     is responsible for deleting it.
     """
 
-    with NamedTemporaryFile(mode='r',delete=False, prefix='highcharts-outfile', suffix='.png') as outfile:
-        with NamedTemporaryFile(prefix='highcharts-infile') as infile:
-            json.dump(chart_definition,infile)
-            infile.flush()
+    outfile = NamedTemporaryFile(mode='r',delete=False, prefix='highcharts-outfile-', suffix='.png')
+    outfile.close()
 
-            if run_highcharts(infile,outfile):
-                return outfile.name
-            else:
-                raise Exception('failed to create chart')
+    with NamedTemporaryFile(prefix='highcharts-infile-') as infile:
+        json.dump(chart_definition,infile)
+        infile.flush()
+
+        if run_highcharts(infile,outfile):
+            return outfile.name
+        else:
+            raise Exception('failed to create chart')
 
 if __name__ == "__main__":
     png_path = render_chart_to_png(EXAMPLE_CHART_DEFINITION)
